@@ -20,7 +20,7 @@ export default async function Page({
 	const { parlor } = await params;
 
 	const response = await fetch(
-		`${process.env.PUBLIC_NEXT_API_URL}/api/parlours?parlor=${parlor}`,
+		`https://pachislot-analysis-cf5t2ypei-kaito-5757.vercel.app/api/parlours?parlor=${parlor}`,
 		{
 			method: "GET",
 			headers: {

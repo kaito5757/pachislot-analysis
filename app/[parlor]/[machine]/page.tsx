@@ -21,7 +21,7 @@ export default async function Page({
 	const { parlor, machine } = await params;
 
 	const response = await fetch(
-		`${process.env.PUBLIC_NEXT_API_URL}/api/slots?parlor=${parlor}&machine=${machine}`,
+		`https://pachislot-analysis-cf5t2ypei-kaito-5757.vercel.app/api/slots?parlor=${parlor}&machine=${machine}`,
 		{
 			method: "GET",
 			headers: {
