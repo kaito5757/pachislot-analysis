@@ -51,7 +51,9 @@ export default async function Page({
 					{machineData.machineData.map((data) => (
 						<TableRow key={data.id}>
 							<TableCell className="font-medium p-2">
-								<Link href={`/${parlor}/${data.id}`}>{data.name}</Link>
+								<Link href={`/${parlor}/${data.id}`} className="w-full block">
+									{data.name}
+								</Link>
 							</TableCell>
 						</TableRow>
 					))}
