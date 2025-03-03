@@ -3,6 +3,7 @@
 import { format } from "@formkit/tempo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -48,13 +49,32 @@ export default function ScrapingForm(props: {
 		name: string;
 	}[];
 }) {
+	const searchParams = useSearchParams();
+	const router = useRouter();
 	const [message, setMessage] = useState<string>("");
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
-			date: new Date(),
+			parlourId: searchParams.get("parlourId") || undefined,
+			date: searchParams.get("date")
+				? new Date(searchParams.get("date") as string)
+				: new Date(),
 		},
 	});
+
+	// URLクエリパラメーターを更新する関数
+	const updateQueryParams = (params: { date?: Date; parlourId?: string }) => {
+		const urlParams = new URLSearchParams(searchParams.toString());
+
+		if (params.date) {
+			urlParams.set("date", format(params.date, "YYYY-MM-DD"));
+		}
+		if (params.parlourId) {
+			urlParams.set("parlourId", params.parlourId);
+		}
+
+		router.push(`?${urlParams.toString()}`);
+	};
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		setMessage("スクレイピング中...");
@@ -94,7 +114,10 @@ export default function ScrapingForm(props: {
 										<FormItem>
 											<FormLabel>パーラー</FormLabel>
 											<Select
-												onValueChange={field.onChange}
+												onValueChange={(value) => {
+													field.onChange(value);
+													updateQueryParams({ parlourId: value });
+												}}
 												value={field.value}
 											>
 												<FormControl>
@@ -144,9 +167,12 @@ export default function ScrapingForm(props: {
 													<Calendar
 														mode="single"
 														selected={field.value}
-														onSelect={(value: Date | undefined) =>
-															value && field.onChange(value)
-														}
+														onSelect={(value: Date | undefined) => {
+															if (value) {
+																field.onChange(value);
+																updateQueryParams({ date: value });
+															}
+														}}
 														initialFocus
 													/>
 												</PopoverContent>

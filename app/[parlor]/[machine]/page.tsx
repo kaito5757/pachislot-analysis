@@ -4,11 +4,14 @@ import {
 	Table,
 	TableBody,
 	TableCell,
+	TableFooter,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
 import { db } from "@/lib/firebase/firebase";
+import { format } from "date-fns";
+import { ja } from "date-fns/locale";
 import { ArrowLeft } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -57,6 +60,7 @@ export default async function Page({
 				slots: {
 					slotNumber: string;
 					coin: string;
+					gameCount: string;
 				}[];
 			}[];
 		}[];
@@ -74,7 +78,25 @@ export default async function Page({
 			<h1 className="mb-4">{machineData?.name ?? ""}</h1>
 			{GroupedSlotData.groupedSlotData?.map((data) => (
 				<div key={uuidv4()} className="mb-8">
-					<h2 className="mb-4">{data.yearMonth}</h2>
+					<h2 className="mb-4">
+						{data.yearMonth}（総差枚:{" "}
+						{data.slotDataList
+							.reduce((acc, curr) => {
+								if (curr.date === "レート" || curr.date === "合計") return acc;
+								const totalDiff = curr.slots.reduce((slotAcc, slot) => {
+									const value = slot.coin.replace(/,/g, "");
+									if (value === "-") return slotAcc;
+									return (
+										slotAcc +
+										(value.startsWith("+") ? 1 : -1) *
+											Number.parseFloat(value.replace(/[+\-]/g, ""))
+									);
+								}, 0);
+								return acc + totalDiff;
+							}, 0)
+							.toLocaleString("ja-JP")}
+						）
+					</h2>
 					<div className="mb-6">
 						<Link
 							href={`/${parlor}`}
@@ -102,7 +124,21 @@ export default async function Page({
 						<TableBody>
 							{data.slotDataList.map((data) => (
 								<TableRow key={uuidv4()}>
-									<TableCell className="font-medium p-2">{data.date}</TableCell>
+									<TableCell className="font-medium p-2">
+										{data.date === "レート" || data.date === "合計"
+											? data.date
+											: format(
+													data.date.includes("-")
+														? new Date(data.date)
+														: new Date(
+																`${data.date.slice(0, 4)}-${data.date.slice(4, 6)}-${data.date.slice(6, 8)}`,
+															),
+													"yyyy/MM/dd(E)",
+													{
+														locale: ja,
+													},
+												)}
+									</TableCell>
 									{data.slots.map((slot) => {
 										const coinDifferenceValue = Number.parseFloat(
 											slot.coin.replace(/,/g, ""),
@@ -119,17 +155,40 @@ export default async function Page({
 																: coinDifferenceValue >= 1000
 																	? "yellow"
 																	: "transparent",
-													color: data.date === "合計" ? "red" : "black",
+													color: data.date === "レート" ? "red" : "black",
+													fontWeight:
+														data.date === "レート" || data.date === "合計"
+															? "bold"
+															: "normal",
 												}}
 												className="p-2 w-[30px]"
 											>
-												{slot.coin}
+												{data.date !== "レート" ? (
+													<>
+														<span className="text-xs">{slot.coin}</span>
+														<br />
+														<span className="text-xs">
+															{slot.gameCount === "-"
+																? ""
+																: `(${slot.gameCount})`}
+														</span>
+													</>
+												) : (
+													slot.coin
+												)}
 											</TableCell>
 										);
 									})}
 								</TableRow>
 							))}
 						</TableBody>
+						<TableFooter>
+							<TableRow>
+								<TableCell colSpan={data.slotDataList.length + 1}>
+									※各データには、「差枚（上）」と「回転数（下）」を表記しています
+								</TableCell>
+							</TableRow>
+						</TableFooter>
 					</Table>
 				</div>
 			))}

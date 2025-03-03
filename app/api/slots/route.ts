@@ -69,7 +69,11 @@ export async function GET(request: Request) {
 					const filteredData = value.filter(
 						(item) => `${item.year}-${item.month}-${item.day}` === date,
 					);
-					const slots: { slotNumber: string; coin: string }[] = [];
+					const slots: {
+						slotNumber: string;
+						coin: string;
+						gameCount: string;
+					}[] = [];
 					for (const uniqueSlotNumber of uniqueSlotNumbers) {
 						const targetData = filteredData.find(
 							(item) => item.slotNumber === uniqueSlotNumber,
@@ -77,6 +81,7 @@ export async function GET(request: Request) {
 						slots.push({
 							slotNumber: uniqueSlotNumber,
 							coin: targetData ? targetData.coinDifference : "-",
+							gameCount: targetData ? targetData.gameCount : "-",
 						});
 					}
 					return {
@@ -86,33 +91,65 @@ export async function GET(request: Request) {
 				});
 
 				const totalData = uniqueSlotNumbers.map((slotNumber) => {
-					const total = value
+					const [rate, total, gameCount] = value
 						.filter((item) => item.slotNumber === slotNumber)
-						.reduce((acc, item) => {
-							const coinDifferenceValue = Number.parseFloat(
-								item.coinDifference.replace(/,/g, ""),
-							);
-							if (coinDifferenceValue >= 5000) {
-								return acc + 3;
-							}
-							if (coinDifferenceValue >= 3000) {
-								return acc + 2;
-							}
-							if (coinDifferenceValue >= 1000) {
-								return acc + 1;
-							}
-							return acc;
-						}, 0);
+						.reduce(
+							(acc, item) => {
+								const rawValue = item.coinDifference.replace(/,/g, "");
+								const coinDifferenceValue =
+									rawValue === "-" ? 0 : Number.parseFloat(rawValue);
+								const rawGameCount = item.gameCount
+									.toString()
+									.replace(/,/g, "");
+								const gameCountValue =
+									rawGameCount === "-" ? 0 : Number.parseInt(rawGameCount, 10);
+
+								if (Number.isNaN(coinDifferenceValue)) {
+									return acc;
+								}
+
+								let rateIncrement = 0;
+
+								if (coinDifferenceValue >= 5000) {
+									rateIncrement = 3;
+								} else if (coinDifferenceValue >= 3000) {
+									rateIncrement = 2;
+								} else if (coinDifferenceValue >= 1000) {
+									rateIncrement = 1;
+								}
+								return [
+									acc[0] + rateIncrement,
+									acc[1] + coinDifferenceValue,
+									acc[2] + gameCountValue,
+								];
+							},
+							[0, 0, 0],
+						);
 
 					return {
-						slotNumber: slotNumber,
-						coin: total.toString(),
+						slotNumber,
+						rate,
+						total: total.toLocaleString("ja-JP"),
+						gameCount: gameCount.toLocaleString("ja-JP"),
 					};
 				});
 
 				slotDataList.push({
 					date: "合計",
-					slots: totalData,
+					slots: totalData.map((item) => ({
+						slotNumber: item.slotNumber,
+						coin: item.total,
+						gameCount: item.gameCount,
+					})),
+				});
+
+				slotDataList.push({
+					date: "レート",
+					slots: totalData.map((item) => ({
+						slotNumber: item.slotNumber,
+						coin: item.rate.toString(),
+						gameCount: item.gameCount,
+					})),
 				});
 
 				return {
