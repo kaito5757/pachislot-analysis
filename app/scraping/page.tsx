@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/firebase/firebase";
+import { Suspense } from "react";
 import ScrapingForm from "./ScrapingForm";
 
 export default async function Page() {
@@ -11,5 +12,9 @@ export default async function Page() {
 		name: doc.data().name,
 	}));
 
-	return <ScrapingForm parlours={parlourData} />;
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<ScrapingForm parlours={parlourData} />
+		</Suspense>
+	);
 }
