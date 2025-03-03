@@ -41,6 +41,7 @@ export default async function Page({
 	);
 
 	const GroupedSlotData = (await response.json()) as {
+		parlourName: string;
 		dataList: {
 			machineId: string;
 			year: string;
@@ -75,7 +76,9 @@ export default async function Page({
 
 	return (
 		<div className="p-4">
-			<h1 className="mb-4">{machineData?.name ?? ""}</h1>
+			<h1 className="mb-4">
+				{`${machineData?.name}（${GroupedSlotData.parlourName}）`}
+			</h1>
 			{GroupedSlotData.groupedSlotData?.map((data) => (
 				<div key={uuidv4()} className="mb-8">
 					<h2 className="mb-4">

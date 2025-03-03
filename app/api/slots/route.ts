@@ -13,6 +13,9 @@ export async function GET(request: Request) {
 		);
 	}
 
+	const parlourDocRef = db.collection("parlours").doc(parlor);
+	const parlourDoc = await parlourDocRef.get();
+
 	try {
 		const slotDocRef = db.collection("slots").doc(parlor);
 		const slotsSnapshot = await slotDocRef
@@ -159,7 +162,11 @@ export async function GET(request: Request) {
 			})
 			.sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
 
-		return NextResponse.json({ dataList, groupedSlotData });
+		return NextResponse.json({
+			parlourName: parlourDoc.data()?.name,
+			dataList,
+			groupedSlotData,
+		});
 	} catch (error) {
 		console.error("Firestoreの取得中にエラーが発生しました:", error);
 		return NextResponse.json(
