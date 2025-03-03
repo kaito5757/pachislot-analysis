@@ -182,8 +182,14 @@ export default function ScrapingForm(props: {
 									)}
 								/>
 
-								<Button type="submit" className="w-full">
-									スクレイピング
+								<Button
+									type="submit"
+									className="w-full"
+									disabled={process.env.VERCEL_ENV === "production"}
+								>
+									{process.env.VERCEL_ENV === "production"
+										? "本番環境はタイムアウト問題でスクレイピングできません...（TODO: inngestで実装すれば解決できる）"
+										: "スクレイピング"}
 								</Button>
 							</form>
 						</Form>
