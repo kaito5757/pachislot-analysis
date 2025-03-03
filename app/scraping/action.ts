@@ -1,16 +1,24 @@
 "use server";
 
+import { format } from "@formkit/tempo";
 import axios from "axios";
-import { load } from "cheerio"; // cheerioをインポート
-import { db } from "../../lib/firebase/firebase"; // Firestoreのインスタンスをインポート
+import { load } from "cheerio";
+import { db } from "../../lib/firebase/firebase";
 
-const targetParlour =
-	"e382a8e382b9e38391e382b9e697a5e68b93e6b88be8b0b7e9a785e5898de696b0e9a4a8code";
+export async function scraping(parlourId: string, date: Date) {
+	const slotData = await getSlotByDate(
+		parlourId,
+		format(date, "YYYY", "ja"),
+		format(date, "MM", "ja"),
+		format(date, "DD", "ja"),
+	);
+	if (slotData) {
+		throw new Error("すでにこの日付のデータが存在しています");
+	}
 
-export async function scraping(targetDate: string) {
 	console.log("スクレイピング開始");
 
-	const targetMachines = await getMachineForParlour(targetParlour);
+	const targetMachines = await getMachineForParlour(parlourId);
 	if (!targetMachines) return;
 
 	const dataList: {
@@ -28,7 +36,7 @@ export async function scraping(targetDate: string) {
 
 	for (const machine of targetMachines) {
 		const response = await axios.get(
-			`https://www.slorepo.com/hole/${targetParlour}/${targetDate}/kishu/?kishu=${machine.name}`,
+			`https://www.slorepo.com/hole/${parlourId}/${format(date, "YYYYMMDD", "ja")}/kishu/?kishu=${machine.name}`,
 		);
 		const $ = load(response.data);
 
@@ -37,9 +45,9 @@ export async function scraping(targetDate: string) {
 			if ($(element).find("td").eq(0).text().trim() === "平均") return;
 			const rowData = {
 				machineId: machine.id,
-				year: targetDate.slice(0, 4),
-				month: targetDate.slice(4, 6),
-				day: targetDate.slice(6, 8),
+				year: format(date, "YYYY", "ja"),
+				month: format(date, "MM", "ja"),
+				day: format(date, "DD", "ja"),
 				slotNumber: $(element).find("td").eq(0).text().trim(),
 				coinDifference: $(element).find("td").eq(1).text().trim(),
 				gameCount: $(element).find("td").eq(2).text().trim(),
@@ -51,8 +59,34 @@ export async function scraping(targetDate: string) {
 		});
 	}
 
-	await addSlots(targetParlour, dataList);
+	await addSlots(parlourId, dataList);
 }
+
+const getSlotByDate = async (
+	parlourId: string,
+	year: string,
+	month: string,
+	day: string,
+) => {
+	const slotDocRef = db.collection("slots").doc(parlourId);
+	const subCollectionRef = slotDocRef.collection("data");
+
+	// 指定された日付のデータをクエリ
+	const querySnapshot = await subCollectionRef
+		.where("year", "==", year)
+		.where("month", "==", month)
+		.where("day", "==", day)
+		.limit(1)
+		.get();
+
+	if (querySnapshot.empty) {
+		return null;
+	}
+	return querySnapshot.docs.map((doc) => ({
+		id: doc.id,
+		...doc.data(),
+	}));
+};
 
 async function addSlots(
 	parlourId: string,

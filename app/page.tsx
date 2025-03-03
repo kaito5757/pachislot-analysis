@@ -20,21 +20,23 @@ export default async function Home() {
 	}));
 
 	return (
-		<Table>
-			<TableHeader>
-				<TableRow>
-					<TableHead>店舗</TableHead>
-				</TableRow>
-			</TableHeader>
-			<TableBody>
-				{parlourData.map((parlour) => (
-					<TableRow key={parlour.id}>
-						<TableCell className="font-medium p-2">
-							<Link href={`/${parlour.id}`}>{parlour.name}</Link>
-						</TableCell>
+		<div className="p-4">
+			<Table className="mb-16">
+				<TableHeader>
+					<TableRow>
+						<TableHead>店舗</TableHead>
 					</TableRow>
-				))}
-			</TableBody>
-		</Table>
+				</TableHeader>
+				<TableBody>
+					{parlourData.map((parlour) => (
+						<TableRow key={parlour.id}>
+							<TableCell className="font-medium p-2">
+								<Link href={`/${parlour.id}`}>{parlour.name}</Link>
+							</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+		</div>
 	);
 }

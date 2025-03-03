@@ -9,6 +9,9 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { db } from "@/lib/firebase/firebase";
+import { ArrowLeft } from "lucide-react";
+import { headers } from "next/headers";
+import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
 
 const CACHE_EXPIRY = 12 * 60 * 60 * 1000;
@@ -20,8 +23,11 @@ export default async function Page({
 }) {
 	const { parlor, machine } = await params;
 
+	const headersList = await headers();
+	const origin = `${headersList.get("x-forwarded-proto")}://${headersList.get("x-forwarded-host")}`;
+
 	const response = await fetch(
-		`https://pachislot-analysis.vercel.app/api/slots?parlor=${parlor}&machine=${machine}`,
+		`${origin}/api/slots?parlor=${parlor}&machine=${machine}`,
 		{
 			method: "GET",
 			headers: {
@@ -66,10 +72,19 @@ export default async function Page({
 	return (
 		<div className="p-4">
 			<h1 className="mb-4">{machineData?.name ?? ""}</h1>
-			{GroupedSlotData.groupedSlotData.map((data) => (
+			{GroupedSlotData.groupedSlotData?.map((data) => (
 				<div key={uuidv4()} className="mb-8">
 					<h2 className="mb-4">{data.yearMonth}</h2>
-					<Table className="min-w-full w-full">
+					<div className="mb-6">
+						<Link
+							href={`/${parlor}`}
+							className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+						>
+							<ArrowLeft className="h-4 w-4 mr-1" />
+							機種一覧に戻る
+						</Link>
+					</div>
+					<Table className="min-w-full w-full mb-16">
 						<TableHeader>
 							<TableRow>
 								<TableHead className="w-[80px] p-2">日付</TableHead>

@@ -21,6 +21,8 @@ export async function GET(request: Request) {
 		name: doc.data().name,
 	}));
 
+	console.log(machineData);
+
 	return NextResponse.json({
 		parlourName: parlourName.data()?.name,
 		machineData,

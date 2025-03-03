@@ -1,3 +1,32 @@
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+import Link from "next/link";
+
 export default function page() {
-	return <div>設定ページ（未着手）</div>;
+	return (
+		<div className="p-4">
+			<Table className="min-w-full w-full mb-16">
+				<TableHeader>
+					<TableRow>
+						<TableHead>設定</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					<TableRow>
+						<TableCell className="font-medium p-2">
+							<Link href={"/setting/parlor"} className="w-full block">
+								店舗追加
+							</Link>
+						</TableCell>
+					</TableRow>
+				</TableBody>
+			</Table>
+		</div>
+	);
 }

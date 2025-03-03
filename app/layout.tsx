@@ -30,7 +30,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased sm:pt-20`}
+				className={`${geistSans.variable} ${geistMono.variable} antialiased mt-14`}
 			>
 				<NavBar items={navItems} />
 				<ProgressBarProvider>{children}</ProgressBarProvider>

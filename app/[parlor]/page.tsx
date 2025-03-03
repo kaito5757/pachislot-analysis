@@ -8,6 +8,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { ArrowLeft } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 const CACHE_EXPIRY = 12 * 60 * 60 * 1000;
@@ -19,16 +21,17 @@ export default async function Page({
 }) {
 	const { parlor } = await params;
 
-	const response = await fetch(
-		`https://pachislot-analysis.vercel.app/api/parlours?parlor=${parlor}`,
-		{
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			next: { revalidate: CACHE_EXPIRY / 1000 },
+	const headersList = await headers();
+	const origin = `${headersList.get("x-forwarded-proto")}://${headersList.get("x-forwarded-host")}`;
+
+	const response = await fetch(`${origin}/api/parlour?parlor=${parlor}`, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
 		},
-	);
+		next: { revalidate: CACHE_EXPIRY / 1000 },
+	});
+	console.log(response);
 
 	const machineData = (await response.json()) as {
 		parlourName: string;
@@ -41,7 +44,16 @@ export default async function Page({
 	return (
 		<div className="p-4">
 			<h1 className="mb-4">{machineData.parlourName}</h1>
-			<Table className="min-w-full w-full">
+			<div className="mb-6">
+				<Link
+					href="/"
+					className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+				>
+					<ArrowLeft className="h-4 w-4 mr-1" />
+					店舗一覧に戻る
+				</Link>
+			</div>
+			<Table className="min-w-full w-full mb-16">
 				<TableHeader>
 					<TableRow>
 						<TableHead>機種</TableHead>
