@@ -48,6 +48,7 @@ export default function ScrapingForm(props: {
 		id: string;
 		name: string;
 	}[];
+	proto: string | null;
 }) {
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -185,10 +186,10 @@ export default function ScrapingForm(props: {
 								<Button
 									type="submit"
 									className="w-full"
-									disabled={process.env.VERCEL_ENV === "production"}
+									disabled={props.proto === "https"}
 								>
-									{process.env.VERCEL_ENV === "production"
-										? "本番環境はタイムアウト問題でスクレイピングできません...（TODO: inngestで実装すれば解決できる）"
+									{props.proto === "https"
+										? "本番はタイムアウトでスクレイピングできません..."
 										: "スクレイピング"}
 								</Button>
 							</form>
