@@ -16,6 +16,7 @@ import { ArrowLeft } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
+import { ExportCSVButton } from "./ExportCSVButton"; // クライアントコンポーネントをインポート
 
 const CACHE_EXPIRY = 12 * 60 * 60 * 1000;
 
@@ -62,6 +63,9 @@ export default async function Page({
 					slotNumber: string;
 					coin: string;
 					gameCount: string;
+					bb: string;
+					rb: string;
+					rate: string;
 				}[];
 			}[];
 		}[];
@@ -100,7 +104,7 @@ export default async function Page({
 							.toLocaleString("ja-JP")}
 						）
 					</h2>
-					<div className="mb-6">
+					<div className="mb-6 flex justify-between items-center">
 						<Link
 							href={`/${parlor}/machines`}
 							className="flex items-center text-sm text-gray-500 hover:text-gray-700"
@@ -108,6 +112,11 @@ export default async function Page({
 							<ArrowLeft className="h-4 w-4 mr-1" />
 							機種一覧に戻る
 						</Link>
+						<ExportCSVButton
+							data={data}
+							machineName={machineData?.name || ""}
+							parlourName={GroupedSlotData.parlourName}
+						/>
 					</div>
 					<Table className="min-w-full w-full mb-16">
 						<TableHeader>

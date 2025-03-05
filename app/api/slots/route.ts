@@ -76,6 +76,9 @@ export async function GET(request: Request) {
 						slotNumber: string;
 						coin: string;
 						gameCount: string;
+						bb: string;
+						rb: string;
+						rate: string;
 					}[] = [];
 					for (const uniqueSlotNumber of uniqueSlotNumbers) {
 						const targetData = filteredData.find(
@@ -85,6 +88,9 @@ export async function GET(request: Request) {
 							slotNumber: uniqueSlotNumber,
 							coin: targetData ? targetData.coinDifference : "-",
 							gameCount: targetData ? targetData.gameCount : "-",
+							bb: targetData ? targetData.bb : "-",
+							rb: targetData ? targetData.rb : "-",
+							rate: targetData ? targetData.rate : "-",
 						});
 					}
 					return {
@@ -143,6 +149,9 @@ export async function GET(request: Request) {
 						slotNumber: item.slotNumber,
 						coin: item.total,
 						gameCount: item.gameCount,
+						bb: "-",
+						rb: "-",
+						rate: "-",
 					})),
 				});
 
@@ -152,6 +161,9 @@ export async function GET(request: Request) {
 						slotNumber: item.slotNumber,
 						coin: item.rate.toString(),
 						gameCount: item.gameCount,
+						bb: "-",
+						rb: "-",
+						rate: "-",
 					})),
 				});
 
