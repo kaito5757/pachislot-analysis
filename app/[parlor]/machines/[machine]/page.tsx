@@ -102,7 +102,7 @@ export default async function Page({
 					</h2>
 					<div className="mb-6">
 						<Link
-							href={`/${parlor}`}
+							href={`/${parlor}/machines`}
 							className="flex items-center text-sm text-gray-500 hover:text-gray-700"
 						>
 							<ArrowLeft className="h-4 w-4 mr-1" />

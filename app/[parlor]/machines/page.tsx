@@ -32,43 +32,45 @@ export default async function Page({
 		next: { revalidate: CACHE_EXPIRY / 1000 },
 	});
 
-	const parlourData = (await response.json()) as {
+	const machineData = (await response.json()) as {
 		parlourName: string;
+		machineData: {
+			id: string;
+			name: string;
+		}[];
 	};
 
 	return (
 		<div className="p-4">
-			<h1 className="mb-4">{parlourData.parlourName}</h1>
+			<h1 className="mb-4">{machineData.parlourName}</h1>
 			<div className="mb-6">
 				<Link
-					href="/"
+					href={`/${parlor}`}
 					className="flex items-center text-sm text-gray-500 hover:text-gray-700"
 				>
 					<ArrowLeft className="h-4 w-4 mr-1" />
-					店舗一覧に戻る
+					店舗TOPに戻る
 				</Link>
 			</div>
 			<Table className="min-w-full w-full mb-16">
 				<TableHeader>
 					<TableRow>
-						<TableHead>データ</TableHead>
+						<TableHead>機種</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					<TableRow>
-						<TableCell className="font-medium p-2">
-							<Link href={`/${parlor}/total`} className="w-full block">
-								月別差枚ランキング
-							</Link>
-						</TableCell>
-					</TableRow>
-					<TableRow>
-						<TableCell className="font-medium p-2">
-							<Link href={`/${parlor}/machines`} className="w-full block">
-								機種データ
-							</Link>
-						</TableCell>
-					</TableRow>
+					{machineData.machineData.map((data) => (
+						<TableRow key={data.id}>
+							<TableCell className="font-medium p-2">
+								<Link
+									href={`/${parlor}/machines/${data.id}`}
+									className="w-full block"
+								>
+									{data.name}
+								</Link>
+							</TableCell>
+						</TableRow>
+					))}
 				</TableBody>
 			</Table>
 		</div>
