@@ -152,9 +152,12 @@ export default async function Page({
 												)}
 									</TableCell>
 									{data.slots.map((slot) => {
-										const coinDifferenceValue = Number.parseFloat(
-											slot.coin.replace(/,/g, ""),
-										);
+										const coinDifferenceValue =
+											slot.coin === "-"
+												? 0
+												: Number.parseFloat(
+														slot.coin.replace(/[+,]/g, "").replace(/-/g, "-"),
+													);
 										return (
 											<TableCell
 												key={uuidv4()}
@@ -182,7 +185,12 @@ export default async function Page({
 														<span className="text-xs">
 															{slot.gameCount === "-"
 																? ""
-																: `(${slot.gameCount})`}
+																: `${slot.gameCount}G`}
+														</span>
+														<br />
+														<span className="text-xs">
+															{slot.bb === "-" ? "" : `BB:${slot.bb}`}
+															{slot.rb === "-" ? "" : ` RB:${slot.rb}`}
 														</span>
 													</>
 												) : (
@@ -197,7 +205,7 @@ export default async function Page({
 						<TableFooter>
 							<TableRow>
 								<TableCell colSpan={data.slotDataList.length + 1}>
-									※各データには、「差枚（上）」と「回転数（下）」を表記しています
+									※各データには、「差枚」「ゲーム数」「BB/RB」「機械割」の情報を表示しています
 								</TableCell>
 							</TableRow>
 						</TableFooter>
