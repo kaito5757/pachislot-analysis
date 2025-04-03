@@ -60,7 +60,7 @@ export default async function Page({
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{["202501", "202502", "202503"].map((i) => {
+					{["202501", "202502", "202503", "202504"].map((i) => {
 						return (
 							<TableRow key={i}>
 								<TableCell className="font-medium p-2">
