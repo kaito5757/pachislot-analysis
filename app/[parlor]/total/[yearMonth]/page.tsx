@@ -8,6 +8,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { date } from "@formkit/tempo";
 import { ArrowLeft } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -43,10 +44,17 @@ export default async function Page({
 		groupedSlotData: {
 			machineId: string;
 			name: string;
+			machineNum: number;
 			total: number;
 			gameCount: number;
 		}[];
 	};
+
+	const targetDay =
+		month === (date().getMonth() + 1).toString().padStart(2, "0")
+			? date().getDate() - 1
+			: new Date(Number(year), Number(month) + 1, 0).getDate();
+	console.log(targetDay);
 
 	return (
 		<div className="p-4">
@@ -64,8 +72,30 @@ export default async function Page({
 				<TableHeader>
 					<TableRow>
 						<TableHead>機種名</TableHead>
-						<TableHead>差枚数</TableHead>
-						<TableHead>回転数</TableHead>
+						<TableHead>
+							<div>
+								機種台数
+								<br />（{targetDay}日時点）
+							</div>
+						</TableHead>
+
+						<TableHead>
+							平均差枚数
+							<br />（{targetDay}日分 / 1台）
+						</TableHead>
+						<TableHead>
+							平均差枚数
+							<br />（{targetDay}日分 / 全台）
+						</TableHead>
+						<TableHead>
+							平均回転数
+							<br />
+							（1日分 / 全台）
+						</TableHead>
+						<TableHead>
+							平均回転数
+							<br />（{targetDay}日分 / 全台）
+						</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -83,10 +113,28 @@ export default async function Page({
 										</Link>
 									</TableCell>
 									<TableCell className="font-medium p-2">
+										{data.machineNum}
+									</TableCell>
+									<TableCell className="font-medium p-2">
+										{data.machineNum &&
+											(data.total / data.machineNum)
+												.toFixed(0)
+												.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+									</TableCell>
+									<TableCell className="font-medium p-2">
 										{data.total.toLocaleString("ja-JP")}
 									</TableCell>
 									<TableCell className="font-medium p-2">
-										{data.gameCount.toLocaleString("ja-JP")}
+										{data.machineNum &&
+											(data.gameCount / data.machineNum / targetDay)
+												.toFixed(0)
+												.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+									</TableCell>
+									<TableCell className="font-medium p-2">
+										{data.machineNum &&
+											(data.gameCount / data.machineNum)
+												.toFixed(0)
+												.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
 									</TableCell>
 								</TableRow>
 							);

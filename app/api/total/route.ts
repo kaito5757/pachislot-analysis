@@ -1,4 +1,5 @@
 import { db } from "@/lib/firebase/firebase";
+import { date } from "@formkit/tempo";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -65,6 +66,15 @@ export async function GET(request: Request) {
 				const coinDiff = String(item.coinDifference).replace(/,/g, "");
 				return acc + Number(coinDiff);
 			}, 0);
+
+			const lastDay = new Date(Number(year), Number(month) + 1, 0).getDate();
+			const machineNum =
+				month === (date().getMonth() + 1).toString().padStart(2, "0")
+					? value.filter(
+							(item) => item.day === (date().getDate() - 1).toString(),
+						).length
+					: value.filter((item) => item.day === lastDay.toString()).length;
+
 			const gameCount = value.reduce((acc, item) => {
 				const games = String(item.gameCount).replace(/,/g, "");
 				return acc + Number(games);
@@ -73,6 +83,7 @@ export async function GET(request: Request) {
 			return {
 				machineId: key,
 				name,
+				machineNum,
 				total,
 				gameCount,
 			};

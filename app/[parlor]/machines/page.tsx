@@ -42,7 +42,17 @@ export default async function Page({
 
 	return (
 		<div className="p-4">
-			<h1 className="mb-4">{machineData.parlourName}</h1>
+			<h1 className="mb-4">
+				{machineData.parlourName}（
+				<Link
+					href={`https://www.slorepo.com/hole/${parlor}`}
+					className="text-blue-600 hover:text-blue-800 hover:underline mb-6 inline-flex items-center"
+					target="_blank"
+				>
+					スロレポで確認する
+				</Link>
+				）
+			</h1>
 			<div className="mb-6">
 				<Link
 					href={`/${parlor}`}
