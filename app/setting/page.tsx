@@ -25,6 +25,13 @@ export default function page() {
 							</Link>
 						</TableCell>
 					</TableRow>
+					<TableRow>
+						<TableCell className="font-medium p-2">
+							<Link href={"/setting/machines"} className="w-full block">
+								機種更新
+							</Link>
+						</TableCell>
+					</TableRow>
 				</TableBody>
 			</Table>
 		</div>
