@@ -32,6 +32,13 @@ export default function page() {
 							</Link>
 						</TableCell>
 					</TableRow>
+					<TableRow>
+						<TableCell className="font-medium p-2">
+							<Link href={"/setting/data-deletion"} className="w-full block">
+								データ削除
+							</Link>
+						</TableCell>
+					</TableRow>
 				</TableBody>
 			</Table>
 		</div>

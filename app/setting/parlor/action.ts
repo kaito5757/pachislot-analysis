@@ -188,6 +188,63 @@ async function updateMachinesInDb(
 	console.log(`Successfully updated machines for parlour: ${parlourId}`);
 }
 
+export async function deleteAllSlotData(parlourId: string, confirmationText: string) {
+	const parlour = await getParlour(parlourId);
+	if (!parlour) {
+		throw new Error("店舗が見つかりません");
+	}
+
+	// 確認テキストが店舗名と一致するかチェック
+	if (confirmationText !== parlour.name) {
+		throw new Error("店舗名が一致しません");
+	}
+
+	// 削除対象データ数を取得
+	const slotsRef = db.collection("slots").doc(parlourId).collection("data");
+	const snapshot = await slotsRef.get();
+	const deleteCount = snapshot.size;
+
+	if (deleteCount === 0) {
+		throw new Error("削除対象のデータがありません");
+	}
+
+	// バッチ削除を実行（500件ずつ分割）
+	const batchSize = 500;
+	const docs = snapshot.docs;
+	
+	for (let i = 0; i < docs.length; i += batchSize) {
+		const batch = db.batch();
+		const batchDocs = docs.slice(i, i + batchSize);
+		
+		for (const doc of batchDocs) {
+			batch.delete(doc.ref);
+		}
+		
+		await batch.commit();
+		console.log(`Deleted batch ${Math.floor(i / batchSize) + 1}: ${batchDocs.length} documents`);
+	}
+
+	return {
+		deletedCount: deleteCount,
+		parlourName: parlour.name,
+	};
+}
+
+export async function getSlotDataCount(parlourId: string) {
+	const parlour = await getParlour(parlourId);
+	if (!parlour) {
+		throw new Error("店舗が見つかりません");
+	}
+
+	const slotsRef = db.collection("slots").doc(parlourId).collection("data");
+	const snapshot = await slotsRef.get();
+
+	return {
+		count: snapshot.size,
+		parlourName: parlour.name,
+	};
+}
+
 async function addParlour(
 	parlourId: string,
 	parlourName: string,
