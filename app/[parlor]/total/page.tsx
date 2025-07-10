@@ -8,6 +8,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { format, subMonths } from "date-fns";
 import { ArrowLeft } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -70,7 +71,7 @@ export default async function Page({
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{["202501", "202502", "202503", "202504"].map((i) => {
+					{generateMonthArray().map((i) => {
 						return (
 							<TableRow key={i}>
 								<TableCell className="font-medium p-2">
@@ -90,3 +91,16 @@ export default async function Page({
 		</div>
 	);
 }
+
+const generateMonthArray = (monthsCount = 6): string[] => {
+	const months: string[] = [];
+	const today = new Date();
+
+	for (let i = monthsCount - 1; i >= 0; i--) {
+		const targetDate = subMonths(today, i);
+		const yearMonth = format(targetDate, "yyyyMM");
+		months.push(yearMonth);
+	}
+
+	return months;
+};

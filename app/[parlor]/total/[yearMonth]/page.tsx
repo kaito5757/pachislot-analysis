@@ -41,7 +41,7 @@ export default async function Page({
 
 	const parlourData = (await response.json()) as {
 		parlourName: string;
-		groupedSlotData: {
+		groupedSlotData?: {
 			machineId: string;
 			name: string;
 			machineNum: number;
@@ -49,6 +49,7 @@ export default async function Page({
 			gameCount: number;
 		}[];
 	};
+	console.log(parlourData.groupedSlotData);
 
 	const targetDay =
 		month === (date().getMonth() + 1).toString().padStart(2, "0")
@@ -100,45 +101,47 @@ export default async function Page({
 				</TableHeader>
 				<TableBody>
 					{parlourData.groupedSlotData
-						.sort((a, b) => b.total - a.total)
-						.map((data) => {
-							return (
-								<TableRow key={data.machineId}>
-									<TableCell className="font-medium p-2">
-										<Link
-											href={`/${parlor}/machines/${data.machineId}`}
-											className="hover:underline"
-										>
-											{data.name}
-										</Link>
-									</TableCell>
-									<TableCell className="font-medium p-2">
-										{data.machineNum}
-									</TableCell>
-									<TableCell className="font-medium p-2">
-										{data.machineNum &&
-											(data.total / data.machineNum)
-												.toFixed(0)
-												.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-									</TableCell>
-									<TableCell className="font-medium p-2">
-										{data.total.toLocaleString("ja-JP")}
-									</TableCell>
-									<TableCell className="font-medium p-2">
-										{data.machineNum &&
-											(data.gameCount / data.machineNum / targetDay)
-												.toFixed(0)
-												.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-									</TableCell>
-									<TableCell className="font-medium p-2">
-										{data.machineNum &&
-											(data.gameCount / data.machineNum)
-												.toFixed(0)
-												.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-									</TableCell>
-								</TableRow>
-							);
-						})}
+						? parlourData.groupedSlotData
+								.sort((a, b) => b.total - a.total)
+								.map((data) => {
+									return (
+										<TableRow key={data.machineId}>
+											<TableCell className="font-medium p-2">
+												<Link
+													href={`/${parlor}/machines/${data.machineId}`}
+													className="hover:underline"
+												>
+													{data.name}
+												</Link>
+											</TableCell>
+											<TableCell className="font-medium p-2">
+												{data.machineNum}
+											</TableCell>
+											<TableCell className="font-medium p-2">
+												{data.machineNum &&
+													(data.total / data.machineNum)
+														.toFixed(0)
+														.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+											</TableCell>
+											<TableCell className="font-medium p-2">
+												{data.total.toLocaleString("ja-JP")}
+											</TableCell>
+											<TableCell className="font-medium p-2">
+												{data.machineNum &&
+													(data.gameCount / data.machineNum / targetDay)
+														.toFixed(0)
+														.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+											</TableCell>
+											<TableCell className="font-medium p-2">
+												{data.machineNum &&
+													(data.gameCount / data.machineNum)
+														.toFixed(0)
+														.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+											</TableCell>
+										</TableRow>
+									);
+								})
+						: []}
 				</TableBody>
 			</Table>
 		</div>

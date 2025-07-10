@@ -40,23 +40,29 @@ export async function scraping(parlourId: string, date: Date) {
 		);
 		const $ = load(response.data);
 
-		$(".table2 tr").each((index, element) => {
-			if (index === 0) return;
-			if ($(element).find("td").eq(0).text().trim() === "平均") return;
-			const rowData = {
-				machineId: machine.id,
-				year: format(date, "YYYY", "ja"),
-				month: format(date, "MM", "ja"),
-				day: format(date, "DD", "ja"),
-				slotNumber: $(element).find("td").eq(0).text().trim(),
-				coinDifference: $(element).find("td").eq(1).text().trim(),
-				gameCount: $(element).find("td").eq(2).text().trim(),
-				bb: $(element).find("td").eq(3).text().trim(),
-				rb: $(element).find("td").eq(4).text().trim(),
-				rate: $(element).find("td").eq(5).text().trim(),
-			};
-			dataList.push(rowData);
-		});
+		const firstTable = $(".table2");
+
+		if (firstTable.length === 1) continue;
+		firstTable
+			.first()
+			.find("tr")
+			.each((index, element) => {
+				if (index === 0) return;
+				if ($(element).find("td").eq(0).text().trim() === "平均") return;
+				const rowData = {
+					machineId: machine.id,
+					year: format(date, "YYYY", "ja"),
+					month: format(date, "MM", "ja"),
+					day: format(date, "DD", "ja"),
+					slotNumber: $(element).find("td").eq(0).text().trim(),
+					coinDifference: $(element).find("td").eq(1).text().trim(),
+					gameCount: $(element).find("td").eq(2).text().trim(),
+					bb: $(element).find("td").eq(3).text().trim(),
+					rb: $(element).find("td").eq(4).text().trim(),
+					rate: $(element).find("td").eq(5).text().trim(),
+				};
+				dataList.push(rowData);
+			});
 	}
 
 	await addSlots(parlourId, dataList);
